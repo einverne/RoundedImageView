@@ -43,14 +43,16 @@ import java.util.Set;
 public class RoundedDrawable extends Drawable {
 
   public static final String TAG = "RoundedDrawable";
-  public static final int DEFAULT_BORDER_COLOR = Color.BLACK;
+  public static final int DEFAULT_BORDER_COLOR = Color.WHITE;
 
   private final RectF mBounds = new RectF();
   private final RectF mDrawableRect = new RectF();
   private final RectF mBitmapRect = new RectF();
   private final Bitmap mBitmap;
   private final Paint mBitmapPaint;
+  /** Bitmap 宽度 */
   private final int mBitmapWidth;
+  /** Bitmap 高度 */
   private final int mBitmapHeight;
   private final RectF mBorderRect = new RectF();
   private final Paint mBorderPaint;
@@ -88,6 +90,7 @@ public class RoundedDrawable extends Drawable {
     mBorderPaint.setStrokeWidth(mBorderWidth);
   }
 
+  /** 从 Bitmap 返回 RoundedDrawable */
   public static RoundedDrawable fromBitmap(Bitmap bitmap) {
     if (bitmap != null) {
       return new RoundedDrawable(bitmap);
@@ -96,6 +99,7 @@ public class RoundedDrawable extends Drawable {
     }
   }
 
+  /** 创建 RoundedDrawable 静态方法 */
   public static Drawable fromDrawable(Drawable drawable) {
     if (drawable != null) {
       if (drawable instanceof RoundedDrawable) {
@@ -122,6 +126,7 @@ public class RoundedDrawable extends Drawable {
     return drawable;
   }
 
+  /** 从 Drawable 中获取 Bitmap */
   public static Bitmap drawableToBitmap(Drawable drawable) {
     if (drawable instanceof BitmapDrawable) {
       return ((BitmapDrawable) drawable).getBitmap();

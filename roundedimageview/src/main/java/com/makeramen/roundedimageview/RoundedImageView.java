@@ -27,7 +27,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
@@ -45,8 +44,14 @@ public class RoundedImageView extends ImageView {
   private static final int TILE_MODE_MIRROR = 2;
 
   public static final String TAG = "RoundedImageView";
+
+  /** 默认圆角大小,当riv_corner_radius设置成负数时默认 */
   public static final float DEFAULT_RADIUS = 0f;
   public static final float DEFAULT_BORDER_WIDTH = 0f;
+  /** TileMode 取值有三种: CLAMP 拉伸, REPEAT 重复, MIRROR 镜像
+   * 拉伸 拉伸图片最后一横行,或者一纵列的像素,需填充内容大小超过bitmap 大小
+   * 重复就是横向、纵向不断重复bitmap,
+   * 镜像就是横向、或者纵向不断翻转重复 */
   public static final Shader.TileMode DEFAULT_TILE_MODE = Shader.TileMode.CLAMP;
   private static final ScaleType[] SCALE_TYPES = {
       ScaleType.MATRIX,
@@ -62,17 +67,24 @@ public class RoundedImageView extends ImageView {
   private final float[] mCornerRadii =
       new float[] { DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS };
 
+  /** 背景 Drawable */
   private Drawable mBackgroundDrawable;
+  /** 边框颜色 */
   private ColorStateList mBorderColor =
       ColorStateList.valueOf(RoundedDrawable.DEFAULT_BORDER_COLOR);
+  /** 边框宽度 */
   private float mBorderWidth = DEFAULT_BORDER_WIDTH;
   private ColorFilter mColorFilter = null;
   private boolean mColorMod = false;
+  /** src 中 Drawable */
   private Drawable mDrawable;
   private boolean mHasColorFilter = false;
   private boolean mIsOval = false;
+  /** 是否变动背景图片 */
   private boolean mMutateBackground = false;
+  /** 资源id */
   private int mResource;
+  /** 背景资源id */
   private int mBackgroundResource;
   private ScaleType mScaleType;
   private Shader.TileMode mTileModeX = DEFAULT_TILE_MODE;
@@ -119,7 +131,7 @@ public class RoundedImageView extends ImageView {
         any = true;
       }
     }
-
+    /** 如果没有单独设置4个角的圆角大小,则默认设置全部 */
     if (!any) {
       if (cornerRadiusOverride < 0) {
         cornerRadiusOverride = DEFAULT_RADIUS;
@@ -128,18 +140,20 @@ public class RoundedImageView extends ImageView {
         mCornerRadii[i] = cornerRadiusOverride;
       }
     }
-
+    /** 边框宽度 */
     mBorderWidth = a.getDimensionPixelSize(R.styleable.RoundedImageView_riv_border_width, -1);
     if (mBorderWidth < 0) {
       mBorderWidth = DEFAULT_BORDER_WIDTH;
     }
-
+    /** 边框颜色 */
     mBorderColor = a.getColorStateList(R.styleable.RoundedImageView_riv_border_color);
     if (mBorderColor == null) {
       mBorderColor = ColorStateList.valueOf(RoundedDrawable.DEFAULT_BORDER_COLOR);
     }
 
+    /** 是否变动背景图片 */
     mMutateBackground = a.getBoolean(R.styleable.RoundedImageView_riv_mutate_background, false);
+    /** 是否椭圆 */
     mIsOval = a.getBoolean(R.styleable.RoundedImageView_riv_oval, false);
 
     final int tileMode = a.getInt(R.styleable.RoundedImageView_riv_tile_mode, TILE_MODE_UNDEFINED);
@@ -258,6 +272,10 @@ public class RoundedImageView extends ImageView {
     setImageDrawable(getDrawable());
   }
 
+  /**
+   * 从 Drawable resource id 获取 RoundedDrawable
+   * @return RoundedDrawable
+     */
   private Drawable resolveResource() {
     Resources rsrc = getResources();
     if (rsrc == null) { return null; }
@@ -296,6 +314,10 @@ public class RoundedImageView extends ImageView {
     setBackgroundDrawable(mBackgroundDrawable);
   }
 
+  /**
+   * 获取背景图片 Drawable
+   * @return Drawable
+     */
   private Drawable resolveBackgroundResource() {
     Resources rsrc = getResources();
     if (rsrc == null) { return null; }
@@ -352,6 +374,11 @@ public class RoundedImageView extends ImageView {
     }
   }
 
+  /**
+   * 更新 RoundedDrawable 属性
+   * @param drawable Drawable
+   * @param scaleType ScaleType
+     */
   private void updateAttrs(Drawable drawable, ScaleType scaleType) {
     if (drawable == null) { return; }
 
@@ -364,6 +391,7 @@ public class RoundedImageView extends ImageView {
               .setTileModeX(mTileModeX)
               .setTileModeY(mTileModeY);
 
+      /** 单独设置圆角 */
       if (mCornerRadii != null) {
         ((RoundedDrawable) drawable).setCornerRadius(
             mCornerRadii[Corner.TOP_LEFT],
